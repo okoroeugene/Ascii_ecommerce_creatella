@@ -110,7 +110,7 @@ export default class Body extends React.Component {
                             <div>
                                 <b>Size</b>: <span>{items.size}</span>
                                 <br />
-                                <b>Price</b>: <span>${items.price}</span>
+                                <b>Price</b>: <span>&#36;{items.price}</span>
                                 {/* <span>&#8358;{items.price}</span> */}
                             </div>
                         </div>
