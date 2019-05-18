@@ -11,7 +11,7 @@ import {
     Card
 } from 'react-bootstrap';
 import axios from 'axios';
-import { relativeTime } from '../helpers';
+import { relativeTime, genRan } from '../helpers';
 import Ads from './Ads';
 
 export default class Body extends React.Component {
@@ -24,12 +24,16 @@ export default class Body extends React.Component {
             isFetching: true,
             isScrollFetching: false,
             filterFinished: false,
-            message: 'not at bottom'
+            message: 'not at bottom',
+            meta: undefined,
+            ads: false,
+            adSrc: []
         }
         this.handleScroll = this.handleScroll.bind(this);
         this.filterStart = 0;
-        this.itemsPerFilter = 20;
+        this.itemsPerFilter = 12;
         this.filterEnd = this.itemsPerFilter;
+        this.index = 0;
     }
     componentDidMount() {
         // var date = new Date();
@@ -83,44 +87,44 @@ export default class Body extends React.Component {
             }
         }, 0);
     }
-    showAds(i) {
-        if (((i + 1) % this.itemsPerFilter) === 0) {
-            // return React.createElement("div", {},
-            //     React.createElement("input", { type: "text", value: "And here is a child" })
-            // )
-            return (
-                <Ads />
-            );
-        }
+    showAds() {
+        return (
+            <Col sm={12} style={{ paddingBottom: 20 }}>
+                <Card className="card0" style={{ padding: 10 }}>
+                    <Ads ran={genRan(this.state.adSrc)} />
+                </Card>
+            </Col>
+        );
     }
     productView(product) {
-        return (
-            product.map((items, i) =>
-                <Col key={i} id={i} sm={3} style={{ paddingBottom: 20 }}>
-                    <Card className="card0" style={{ padding: 10 }}>
-                        <div>
-                            <span className="date1">{relativeTime(items.date)}</span>
-                        </div>
-                        <Card.Body className="coverProduct" style={{ textAlign: "center", fontSize: items.size }}>
-                            <div className="face0">{items.face}</div>
-                        </Card.Body>
-                        <div style={{ paddingTop: 5 }}>
-                            <div className="date0">
-                                <div>
-                                    <b>Size</b>: <span>{items.size}</span>
-                                    <br />
-                                    <b>Price</b>: <span>${items.price}</span>
-                                    {/* <span>&#8358;{items.price}</span> */}
-                                </div>
+        let _ads, _main;
+        var gridView = product.map((items, i) => {
+            _main = <Col key={i} sm={3} style={{ paddingBottom: 20 }}>
+                <Card className="card0" style={{ padding: 10 }}>
+                    <div>
+                        <span className="date1">{relativeTime(items.date)}</span>
+                    </div>
+                    <Card.Body className="coverProduct" style={{ textAlign: "center", fontSize: items.size }}>
+                        <div className="face0">{items.face}</div>
+                    </Card.Body>
+                    <div style={{ paddingTop: 5 }}>
+                        <div className="date0">
+                            <div>
+                                <b>Size</b>: <span>{items.size}</span>
+                                <br />
+                                <b>Price</b>: <span>${items.price}</span>
+                                {/* <span>&#8358;{items.price}</span> */}
                             </div>
                         </div>
-                    </Card>
-                    <br />
-                    <div >
-                    {this.showAds(i)}
                     </div>
-                </Col>)
-        );
+                </Card>
+            </Col>
+            _ads = i && (i % 20) === 0 ? this.showAds() : null;
+            if (!_ads || !_main)
+                return _ads || _main
+            return [_ads, _main]
+        })
+        return gridView;
     }
     render() {
         return (
@@ -150,7 +154,7 @@ export default class Body extends React.Component {
                                         </select>
                                     </div>
                                 </Card.Header>
-                                <Row style={{ padding: 35, flex: 1, justifyContent: "center" }}>
+                                <Row id="ad0" ref="ad0" style={{ padding: 35, flex: 1, justifyContent: "center" }}>
                                     {
                                         this.state.isFetching ? <h3 style={{ textAlign: "center" }}><span>Loading...</span></h3> : this.productView(this.state.filteredProducts)
                                     }
