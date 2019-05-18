@@ -35,6 +35,17 @@ export default class Body extends React.Component {
         this.filterEnd = this.itemsPerFilter;
         this.index = 0;
     }
+
+    //For the purpose of this project, i did not use redux for state management
+    //If it were to be an enterprise application, I would have integrated redux 
+    //to manage my state
+    //I also would have done this on react native, but it wasn't possible due to
+    //time factor
+    //If I were to use redux, my folder structure would change, I will have an 
+    //action, reducer and store folders.
+    //Packages like bindActionCreators and connect redux would also be used for 
+    //the purpose of using redux.
+    
     componentDidMount() {
         // var date = new Date();
         // console.log(date)
