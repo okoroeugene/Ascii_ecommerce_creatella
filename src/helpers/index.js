@@ -38,6 +38,7 @@ export function relativeTime(previous) {
     }
 
     else {
+        var options = { year: 'numeric', month: 'long', day: 'numeric' };
         return prevDate.toLocaleDateString("en-US", options);
     }
 
@@ -54,9 +55,11 @@ export function relativeTime(previous) {
     // }
 }
 
-export function genRan(arr) {
+export function genRan() {
     var ran = Math.floor(Math.random() * 1000);
-    while (arr.indexOf(ran) !== -1) {
+    var prev = localStorage.getItem("ADS");
+    while (ran != prev) {
+        localStorage.setItem("ADS", ran);
         break;
     }
     return ran;

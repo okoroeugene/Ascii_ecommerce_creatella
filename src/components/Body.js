@@ -53,6 +53,20 @@ export default class Body extends React.Component {
             this.filterProducts();
         })
     }
+    filterProducts() {
+        if (this.state.products.length < this.filterEnd) {
+            return this.setState({
+                filterFinished: true,
+                isScrollFetching: false
+            })
+        }
+        return this.setState({
+            filteredProducts: this.state.products.slice(0, this.filterEnd),
+            filterStart: this.filterStart += this.itemsPerFilter,
+            filterEnd: this.filterEnd += this.itemsPerFilter,
+            isScrollFetching: true
+        })
+    }
     handleSort(event) {
         this.setState({ isFetching: true, isScrollFetching: false, filterFinished: false })
         let { name, value } = event.target;
@@ -64,34 +78,18 @@ export default class Body extends React.Component {
             this.filterProducts();
         })
     }
-    filterProducts() {
-        if (this.state.products.length < this.filterEnd) {
-            this.setState({
-                filterFinished: true
-            })
-            // return;
-        }
-        this.setState({
-            filteredProducts: this.state.products.slice(0, this.filterEnd),
-            filterStart: this.filterStart += this.itemsPerFilter,
-            filterEnd: this.filterEnd += this.itemsPerFilter
-        })
-    }
     handleScroll() {
-        setTimeout(() => {
-            this.setState({ isScrollFetching: true, filterFinished: false })
-            let { clientHeight, scrollHeight, offsetHeight, pageYOffset } = this.refs.card;
-            if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 300) && this.filterStart > 0) {
-                this.filterProducts();
-                this.setState({ isScrollFetching: false })
-            }
-        }, 0);
+        // this.setState({ isScrollFetching: true, filterFinished: false })
+        // let { clientHeight, scrollHeight, offsetHeight, pageYOffset } = this.refs.card;
+        if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 300) && this.filterStart > 0) {
+            this.filterProducts();
+        }
     }
     showAds() {
         return (
             <Col sm={12} style={{ paddingBottom: 20 }}>
                 <Card className="card0" style={{ padding: 10 }}>
-                    <Ads ran={genRan(this.state.adSrc)} />
+                    <Ads ran={genRan()} />
                 </Card>
             </Col>
         );
