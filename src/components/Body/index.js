@@ -185,7 +185,8 @@ export default class Body extends React.Component {
                                         <select
                                             style={{
                                                 width: 210,
-                                                height: 35
+                                                height: 35,
+                                                fontWeight: "bold"
                                             }}
                                             className="form-control"
                                             onChange={this.handleSort.bind(this)}
