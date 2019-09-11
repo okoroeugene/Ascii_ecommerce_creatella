@@ -1,5 +1,6 @@
 
-
+let currVal = 1;
+let maxValue = 10;
 export function relativeTime(previous) {
     var date = new Date();
     var prevDate = new Date(previous);
@@ -7,20 +8,14 @@ export function relativeTime(previous) {
     var hour = min * 60;
     var day = hour * 24;
     var week = day * 7;
-    // var month = day * 30;
-    // var year = month * 365;
 
     var elapsed = date - prevDate;
 
     if (elapsed < min) {
-        console.log('-------------------elapsed min-------------------------')
-        console.log(elapsed)
         return Math.round(elapsed / 1000) + ' seconds ago';
     }
 
     else if (elapsed < hour) {
-        console.log('-------------------elapsed hour-------------------------')
-        console.log(elapsed)
         return Math.round(elapsed / min) + ' minutes ago';
     }
 
@@ -41,26 +36,20 @@ export function relativeTime(previous) {
         var options = { year: 'numeric', month: 'long', day: 'numeric' };
         return prevDate.toLocaleDateString("en-US", options);
     }
-
-    // else if (elapsed < msPerMonth) {
-    //     return 'approximately ' + Math.round(elapsed / day) + ' days ago';
-    // }
-
-    // else if (elapsed < msPerYear) {
-    //     return 'approximately ' + Math.round(elapsed / month) + ' months ago';
-    // }
-
-    // else {
-    //     return 'approximately ' + Math.round(elapsed / year) + ' years ago';
-    // }
 }
 
 export function genRan() {
-    var ran = Math.floor(Math.random() * 1000);
-    var prev = localStorage.getItem("ADS");
-    while (ran != prev) {
-        localStorage.setItem("ADS", ran);
+    var prev = localStorage.getItem("ADS"),
+        jsonObj = JSON.parse(prev) || [];
+    if (currVal === 10) {
+        jsonObj = [];
+        currVal = 1;
+    }
+    while (!jsonObj.includes(currVal)) {
+        jsonObj.push(currVal)
+        localStorage.setItem("ADS", JSON.stringify(jsonObj));
+        currVal++;
         break;
     }
-    return ran;
+    return currVal;
 }

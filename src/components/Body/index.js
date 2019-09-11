@@ -2,17 +2,13 @@ import React from 'react';
 import {
     Container,
     Row,
-    FormControl,
-    Button,
-    ListGroup,
-    Carousel,
     Col,
-    InputGroup,
     Card
 } from 'react-bootstrap';
 import axios from 'axios';
-import { relativeTime, genRan } from '../helpers';
-import Ads from './Ads';
+import { relativeTime, genRan } from '../../helpers';
+import Ads from '../Ads';
+import './index.css';
 
 export default class Body extends React.Component {
     constructor(props) {
@@ -27,25 +23,32 @@ export default class Body extends React.Component {
             message: 'not at bottom',
             meta: undefined,
             ads: false,
-            adSrc: []
+            adSrc: [],
+            fetchAds: false
         }
         this.handleScroll = this.handleScroll.bind(this);
         this.filterStart = 0;
         this.itemsPerFilter = 12;
-        this.filterEnd = this.itemsPerFilter;
+        this.filterEnd = 0;
         this.index = 0;
+        this.scrolled = false;
+        this.lastIndex = null;
+        this.query = 0;
     }
 
-    //For the purpose of this project, i did not use redux for state management
-    //If it were to be an enterprise application, I would have integrated redux 
-    //to manage my state
-    //I also would have done this on react native, but it wasn't possible due to
-    //time factor
-    //If I were to use redux, my folder structure would change, I will have an 
-    //action, reducer and store folders.
-    //Packages like bindActionCreators and connect redux would also be used for 
-    //the purpose of using redux.
-    
+    /****
+     * For the purpose of this project, i did not use redux for state management
+     * Redux would definitely come in handy when am doing a full blown application
+     * I could as well come up with the react native project for this task
+     * @fetchProduct is called at the initial render of this component, this fetches all products from the API given
+     * @appendAdvert handles the logic for the ADS appearing after every 20th product displayed
+     * @filterProducts returns the filtered product array and paginates it (Infinte Scroll)
+     * @handleSort returns the sorted product
+     * @handleScroll checks if the user has scrolled to the bottom of the webpage
+     * @showAds returns the jsx component for the ad banner
+     * @productView returns the jsx component for the products
+     */
+
     componentDidMount() {
         // var date = new Date();
         // console.log(date)
@@ -55,29 +58,48 @@ export default class Body extends React.Component {
     componentWillUnmount() {
         window.removeEventListener("scroll", this.handleScroll);
     }
+
     fetchProduct(url) {
         axios.get(url).then(response => {
             this.setState({
                 isFetching: false,
-                products: response.data
+                products: this.appendAdvert(response.data)
             })
             this.filterProducts();
         })
     }
-    filterProducts() {
+
+    appendAdvert(product) {
+        var tempProduct = [];
+        product.map((products, key) => {
+            if (key !== 0 && (key % 20) === 0) {
+                products = Object.assign(products, {
+                    advert: true,
+                    adQuery: Math.round(Math.random() * 1000)
+                })
+            }
+            tempProduct.push(products);
+        })
+        return tempProduct;
+    }
+
+    filterProducts(event) {
+        var products = event === "sort" ? this.appendAdvert(this.state.products) : this.state.products;
         if (this.state.products.length < this.filterEnd) {
             return this.setState({
                 filterFinished: true,
-                isScrollFetching: false
+                isScrollFetching: false,
+                filteredProducts: products.slice(this.filterStart, this.filterEnd)
             })
         }
+
+        event !== "sort" ? this.filterEnd += this.itemsPerFilter : this.filterEnd;
         return this.setState({
-            filteredProducts: this.state.products.slice(0, this.filterEnd),
-            filterStart: this.filterStart += this.itemsPerFilter,
-            filterEnd: this.filterEnd += this.itemsPerFilter,
+            filteredProducts: products.slice(this.filterStart, this.filterEnd),
             isScrollFetching: true
         })
     }
+
     handleSort(event) {
         this.setState({ isFetching: true, isScrollFetching: false, filterFinished: false })
         let { name, value } = event.target;
@@ -85,29 +107,37 @@ export default class Body extends React.Component {
             this.setState({
                 isFetching: false,
                 products: response.data
+            }, () => {
+                this.filterProducts("sort");
             })
-            this.filterProducts();
         })
     }
+
     handleScroll() {
-        // this.setState({ isScrollFetching: true, filterFinished: false })
-        // let { clientHeight, scrollHeight, offsetHeight, pageYOffset } = this.refs.card;
-        if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 300) && this.filterStart > 0) {
-            this.filterProducts();
+        if (!this.scrolled) {
+            if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 300) && this.filterEnd > 0) {
+                this.scrolled = true;
+                setTimeout(() => {
+                    this.filterProducts();
+                    this.scrolled = false;
+                }, 2000);
+            }
         }
     }
-    showAds() {
+
+    showAds(meta, key) {
         return (
-            <Col sm={12} style={{ paddingBottom: 20 }}>
+            <Col key={key} sm={12} style={{ paddingBottom: 20 }}>
                 <Card className="card0" style={{ padding: 10 }}>
-                    <Ads ran={genRan()} />
+                    <Ads query={meta.adQuery} />
                 </Card>
             </Col>
         );
     }
+
     productView(product) {
         let _ads, _main;
-        var gridView = product.map((items, i) => {
+        return product.map((items, i) => {
             _main = <Col key={i} sm={3} style={{ paddingBottom: 20 }}>
                 <Card className="card0" style={{ padding: 10 }}>
                     <div>
@@ -122,25 +152,30 @@ export default class Body extends React.Component {
                                 <b>Size</b>: <span>{items.size}</span>
                                 <br />
                                 <b>Price</b>: <span>&#36;{items.price}</span>
-                                {/* <span>&#8358;{items.price}</span> */}
                             </div>
                         </div>
                     </div>
                 </Card>
             </Col>
-            _ads = i && (i % 20) === 0 ? this.showAds() : null;
+            _ads = i !== 0 && (i % 20) === 0 ? this.showAds(items, i) : null;
             if (!_ads || !_main)
                 return _ads || _main
             return [_ads, _main]
         })
-        return gridView;
     }
+
     render() {
+        const { filteredProducts } = this.state;
         return (
             <Container>
                 <section>
                     <Row>
                         <Col sm={12} ref="card">
+                            <span>
+                                Showing{" "}
+                                <b>{filteredProducts.length > 0 && filteredProducts.length}{" "}</b>
+                                faces
+                            </span>
                             <Card className="card0">
                                 <Card.Header className="cardHead0">
                                     <div style={{ float: "left" }}>
@@ -169,10 +204,12 @@ export default class Body extends React.Component {
                                     }
                                 </Row>
                                 {
-                                    this.state.isScrollFetching && this.state.filteredProducts.length > 0 ? <p><h3 style={{ textAlign: "center" }}><span>Loading...</span></h3></p> : null
+                                    this.state.isScrollFetching && this.state.filteredProducts.length > 0 ?
+                                        <p><h3 style={{ textAlign: "center" }}><span>Loading...</span></h3></p> : null
                                 }
                                 {
-                                    this.state.filterFinished && this.state.filteredProducts.length > 0 ? <p><h3 style={{ textAlign: "center", color: "#B22222" }}>--- end of catalogue ---</h3></p> : null
+                                    this.state.filterFinished && this.state.filteredProducts.length > 0 ?
+                                        <p><h3 style={{ textAlign: "center", color: "#B22222" }}>--- end of catalogue ---</h3></p> : null
                                 }
                             </Card>
                         </Col>

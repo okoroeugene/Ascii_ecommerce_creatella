@@ -1,0 +1,12 @@
+
+.footer0 {
+    height: 240px;
+    background-color: #373A3C; 
+    margin-top: 100px;
+    padding: 80px;
+    display: flex;
+}
+
+.footerContent {
+    width: 100%;
+}
