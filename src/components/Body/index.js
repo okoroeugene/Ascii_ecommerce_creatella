@@ -75,11 +75,12 @@ export default class Body extends React.Component {
             if (key !== 0 && (key % 20) === 0) {
                 products = Object.assign(products, {
                     advert: true,
-                    adQuery: Math.round(Math.random() * 1000)
+                    adQuery: genRan()
                 })
             }
             tempProduct.push(products);
         })
+        console.log(tempProduct)
         return tempProduct;
     }
 
@@ -165,17 +166,17 @@ export default class Body extends React.Component {
     }
 
     render() {
-        const { filteredProducts } = this.state;
+        const { filteredProducts, products } = this.state;
         return (
             <Container>
                 <section>
                     <Row>
                         <Col sm={12} ref="card">
-                            <span>
+                            {filteredProducts.length > 0 ? <span>
                                 Showing{" "}
-                                <b>{filteredProducts.length > 0 && filteredProducts.length}{" "}</b>
+                                <b>{filteredProducts.length > 0 && filteredProducts.length}{" - "} {products.length} {" "}</b>
                                 faces
-                            </span>
+                            </span> : null}
                             <Card className="card0">
                                 <Card.Header className="cardHead0">
                                     <div style={{ float: "left" }}>

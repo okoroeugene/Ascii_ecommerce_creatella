@@ -1,5 +1,5 @@
 
-let currVal = 1;
+let advertIndexes = [];
 let maxValue = 10;
 export function relativeTime(previous) {
     var date = new Date();
@@ -39,17 +39,14 @@ export function relativeTime(previous) {
 }
 
 export function genRan() {
-    var prev = localStorage.getItem("ADS"),
-        jsonObj = JSON.parse(prev) || [];
-    if (currVal === 10) {
-        jsonObj = [];
-        currVal = 1;
+    let ran = Math.round(Math.random() * 10) + 1;
+    while (advertIndexes.indexOf(ran) === -1) {
+        if (advertIndexes.length === 2) {
+            advertIndexes = [advertIndexes[advertIndexes.length - 1]];
+        }
+        advertIndexes.push(ran)
+        console.log(advertIndexes)
+        return ran;
     }
-    while (!jsonObj.includes(currVal)) {
-        jsonObj.push(currVal)
-        localStorage.setItem("ADS", JSON.stringify(jsonObj));
-        currVal++;
-        break;
-    }
-    return currVal;
+    return advertIndexes[advertIndexes.length - 1] === ran ? advertIndexes[advertIndexes.length - 1] + 1: ran
 }
