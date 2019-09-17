@@ -39,8 +39,16 @@ export function relativeTime(previous) {
 }
 
 export function genRan() {
-    let ran = Math.round(Math.random() * 10) + 1;
+    /**
+     * This generates a random number between 0 and 10
+     * It could be any value, 10 was used because i'm targeting integers not more than 10
+     */
+    let ran = Math.round(Math.random() * 10);
     while (advertIndexes.indexOf(ran) === -1) {
+        /**
+         * This checks for repetition twice in a row
+         * Once the length is 2 it clears the array and retains the last element to avoid repeating it
+         */
         if (advertIndexes.length === 2) {
             advertIndexes = [advertIndexes[advertIndexes.length - 1]];
         }
@@ -48,5 +56,5 @@ export function genRan() {
         console.log(advertIndexes)
         return ran;
     }
-    return advertIndexes[advertIndexes.length - 1] === ran ? advertIndexes[advertIndexes.length - 1] + 1: ran
+    return genRan();
 }
