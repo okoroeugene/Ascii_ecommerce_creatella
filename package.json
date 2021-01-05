@@ -15,7 +15,7 @@
   "author": "Obinna Okoro",
   "license": "",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "bootstrap": "^4.3.1",
     "cool-ascii-faces": "^1.3.4",
     "css-loader": "^2.1.1",
